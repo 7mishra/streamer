@@ -10,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -18,8 +19,7 @@ public class VideoStorageService {
     private final Path fileStorageLocation;
 
     public VideoStorageService() {
-        // Configure this path (e.g., from application.properties)
-        String uploadDir = "uploads/videos"; // A subdirectory in your project or an absolute path
+        String uploadDir = "uploads/videos";
         this.fileStorageLocation = Paths.get(uploadDir).toAbsolutePath().normalize();
         try {
             Files.createDirectories(this.fileStorageLocation);
@@ -28,7 +28,7 @@ public class VideoStorageService {
         }
     }
 
-    public String storeVideo(InputStream inputStream, String originalFilename, String contentType) throws IOException {
+    public List<String> storeVideo(InputStream inputStream, String originalFilename, String contentType) throws IOException {
         String fileName = StringUtils.cleanPath(originalFilename);
 
         // Generate a unique file name to prevent overwrites and provide security
@@ -37,7 +37,7 @@ public class VideoStorageService {
         if (dotIndex > 0 && dotIndex < fileName.length() - 1) {
             fileExtension = fileName.substring(dotIndex);
         }
-        String uniqueFileName = UUID.randomUUID().toString() + fileExtension;
+        String uniqueFileName = UUID.randomUUID() + fileExtension;
 
         try {
             if (uniqueFileName.contains("..")) {
@@ -49,8 +49,7 @@ public class VideoStorageService {
             // Use Files.copy for efficient streaming directly from InputStream to File
             // StandardCopyOption.REPLACE_EXISTING ensures if a file with the same name exists, it's replaced
             Files.copy(inputStream, targetLocation, StandardCopyOption.REPLACE_EXISTING);
-
-            return uniqueFileName;
+            return List.of(uniqueFileName, targetLocation.toString());
         } catch (IOException ex) {
             throw new IOException("Could not store file " + originalFilename + ". Please try again!", ex);
         } finally {

@@ -8,14 +8,14 @@ import org.springframework.web.multipart.MultipartFile;
 
 
 @RestController
-@RequestMapping("/api/videos")
+@RequestMapping("/api/uploads")
 public class UploadController {
 
-    private final VideoStorageService videoStorageService;
+    private final UploadService uploadService;
 
     @Autowired
-    public UploadController(VideoStorageService videoStorageService) {
-        this.videoStorageService = videoStorageService;
+    public UploadController(UploadService uploadService) {
+        this.uploadService = uploadService;
     }
 
     @ResponseStatus(HttpStatus.OK)
@@ -29,13 +29,10 @@ public class UploadController {
         if (file.isEmpty()) {
             return new ResponseEntity<>("Please select a file to upload.", HttpStatus.BAD_REQUEST);
         }
-
-        try {
-            String uniqueFileName = videoStorageService.storeVideo(file.getInputStream(), file.getOriginalFilename(), file.getContentType());
-            return new ResponseEntity<>("Video uploaded successfully! Stored as: " + uniqueFileName, HttpStatus.OK);
-
-        } catch (Exception e) {
-            return new ResponseEntity<>("An error occurred during upload: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        if (this.uploadService.uploadVideo(file, "test")) {
+            return new ResponseEntity<>("Video uploaded successfully!", HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("An error occurred during upload", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

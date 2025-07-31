@@ -33,10 +33,6 @@ public class AuthController {
     @PostMapping("/signup")
     public ResponseEntity<?> newUser(@RequestBody NewUser newUser) {
         System.out.println("Creating user");
-        System.out.println(newUser.getPassword());
-        System.out.println(newUser.getUsername());
-        System.out.println(newUser.getEmail());
-
         Optional<User> user  = this.authService.createUser(newUser);
         System.out.println(user.toString());
         if (user.isPresent()) {

@@ -11,7 +11,7 @@ import java.util.Optional;
 
 @Service
 public class AuthService {
-    private final PasswordEncoder passwordEncoder; // Inject the PasswordEncoder
+    private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
 
     @Autowired
